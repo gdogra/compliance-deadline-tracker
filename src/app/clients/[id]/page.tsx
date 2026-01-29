@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Client, ClientDeadline, DeadlineStatus } from '@/types/database'
+import { Client, ClientDeadline } from '@/types/database'
 import { format, isPast, isToday } from 'date-fns'
 import { 
   Calendar, ArrowLeft, Building2, User, MapPin, Mail, Phone, 
@@ -71,12 +71,9 @@ export default function ClientDetailPage() {
   }
 
   async function markComplete(deadlineId: string) {
-    await supabase
-      .from('client_deadlines')
-      .update({ 
-        status: 'completed', 
-        completed_at: new Date().toISOString() 
-      } as { status: DeadlineStatus; completed_at: string })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase.from('client_deadlines') as any)
+      .update({ status: 'completed', completed_at: new Date().toISOString() })
       .eq('id', deadlineId)
     fetchDeadlines()
   }

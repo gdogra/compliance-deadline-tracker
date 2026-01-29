@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { DeadlineStatus } from '@/types/database'
 import { MessageCircle, X, Send, Bot, User, Sparkles, Calendar, CheckCircle, Search } from 'lucide-react'
 import { format, isToday, isTomorrow, isThisWeek, isPast, addDays } from 'date-fns'
 import Link from 'next/link'
@@ -299,12 +298,9 @@ export default function Chatbot() {
 
   async function handleAction(action: ChatAction) {
     if (action.type === 'complete' && action.deadlineId) {
-      await supabase
-        .from('client_deadlines')
-        .update({ 
-          status: 'completed', 
-          completed_at: new Date().toISOString() 
-        } as { status: DeadlineStatus; completed_at: string })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.from('client_deadlines') as any)
+        .update({ status: 'completed', completed_at: new Date().toISOString() })
         .eq('id', action.deadlineId)
       
       setMessages(prev => [...prev, {

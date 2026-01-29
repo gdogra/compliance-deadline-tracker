@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { ClientDeadline, Client, DeadlineStatus } from '@/types/database'
+import { ClientDeadline, Client } from '@/types/database'
 import { format, isToday, isTomorrow, isThisWeek, isPast, addDays } from 'date-fns'
 import { 
   Calendar, Bell, CheckCircle, Clock, AlertTriangle, 
@@ -58,12 +58,9 @@ export default function Dashboard() {
   }
 
   async function markComplete(deadlineId: string) {
-    const { error } = await supabase
-      .from('client_deadlines')
-      .update({ 
-        status: 'completed',
-        completed_at: new Date().toISOString()
-      } as { status: DeadlineStatus; completed_at: string })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.from('client_deadlines') as any)
+      .update({ status: 'completed', completed_at: new Date().toISOString() })
       .eq('id', deadlineId)
 
     if (!error) {
@@ -74,12 +71,9 @@ export default function Dashboard() {
   async function bulkMarkComplete() {
     if (selectedIds.size === 0) return
     
-    const { error } = await supabase
-      .from('client_deadlines')
-      .update({ 
-        status: 'completed',
-        completed_at: new Date().toISOString()
-      } as { status: DeadlineStatus; completed_at: string })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.from('client_deadlines') as any)
+      .update({ status: 'completed', completed_at: new Date().toISOString() })
       .in('id', Array.from(selectedIds))
 
     if (!error) {

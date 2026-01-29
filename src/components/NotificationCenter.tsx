@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { ClientDeadline, Client, DeadlineStatus } from '@/types/database'
+import { ClientDeadline, Client } from '@/types/database'
 import { format, isPast, isToday, isTomorrow, addDays } from 'date-fns'
 import { Bell, AlertTriangle, Clock, Calendar, X, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -75,12 +75,9 @@ export default function NotificationCenter() {
   }
 
   async function markComplete(id: string) {
-    await supabase
-      .from('client_deadlines')
-      .update({ 
-        status: 'completed', 
-        completed_at: new Date().toISOString() 
-      } as { status: DeadlineStatus; completed_at: string })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase.from('client_deadlines') as any)
+      .update({ status: 'completed', completed_at: new Date().toISOString() })
       .eq('id', id)
     fetchUpcoming()
   }
