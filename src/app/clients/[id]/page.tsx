@@ -32,18 +32,22 @@ export default function ClientDetailPage() {
 
   const supabase = createClient()
 
+  // Normalize params.id to a string
+  const clientId = typeof params.id === 'string' ? params.id : Array.isArray(params.id) ? params.id[0] : null
+
   useEffect(() => {
-    if (params.id) {
+    if (clientId) {
       fetchClient()
       fetchDeadlines()
     }
-  }, [params.id])
+  }, [clientId])
 
   async function fetchClient() {
+    if (!clientId) return
     const { data, error } = await supabase
       .from('clients')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', clientId)
       .single()
 
     if (!error && data) {
@@ -52,11 +56,12 @@ export default function ClientDetailPage() {
   }
 
   async function fetchDeadlines() {
+    if (!clientId) return
     setLoading(true)
     const { data, error } = await supabase
       .from('client_deadlines')
       .select('*')
-      .eq('client_id', params.id)
+      .eq('client_id', clientId)
       .order('due_date', { ascending: true })
 
     if (!error) {
