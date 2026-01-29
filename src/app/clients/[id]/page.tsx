@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Client, ClientDeadline } from '@/types/database'
+import { Client, ClientDeadline, DeadlineStatus, Database } from '@/types/database'
 import { format, isPast, isToday } from 'date-fns'
 import { 
   Calendar, ArrowLeft, Building2, User, MapPin, Mail, Phone, 
@@ -73,7 +73,10 @@ export default function ClientDetailPage() {
   async function markComplete(deadlineId: string) {
     await supabase
       .from('client_deadlines')
-      .update({ status: 'completed' as const, completed_at: new Date().toISOString() })
+      .update({ 
+        status: 'completed' as DeadlineStatus, 
+        completed_at: new Date().toISOString() 
+      } as Database['public']['Tables']['client_deadlines']['Update'])
       .eq('id', deadlineId)
     fetchDeadlines()
   }

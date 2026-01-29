@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { DeadlineStatus, Database } from '@/types/database'
 import { MessageCircle, X, Send, Bot, User, Sparkles, Calendar, CheckCircle, Search } from 'lucide-react'
 import { format, isToday, isTomorrow, isThisWeek, isPast, addDays } from 'date-fns'
 import Link from 'next/link'
@@ -300,7 +301,10 @@ export default function Chatbot() {
     if (action.type === 'complete' && action.deadlineId) {
       await supabase
         .from('client_deadlines')
-        .update({ status: 'completed' as const, completed_at: new Date().toISOString() })
+        .update({ 
+          status: 'completed' as DeadlineStatus, 
+          completed_at: new Date().toISOString() 
+        } as Database['public']['Tables']['client_deadlines']['Update'])
         .eq('id', action.deadlineId)
       
       setMessages(prev => [...prev, {
