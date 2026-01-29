@@ -4,6 +4,7 @@ import "./globals.css";
 import dynamic from "next/dynamic";
 
 const CommandPalette = dynamic(() => import("@/components/CommandPalette"), { ssr: false });
+const Chatbot = dynamic(() => import("@/components/Chatbot"), { ssr: false });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +34,7 @@ export default function RootLayout({
       >
         {children}
         <CommandPalette />
+        <Chatbot />
       </body>
     </html>
   );
