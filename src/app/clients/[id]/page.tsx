@@ -73,7 +73,7 @@ export default function ClientDetailPage() {
   async function markComplete(deadlineId: string) {
     await supabase
       .from('client_deadlines')
-      .update({ status: 'completed', completed_at: new Date().toISOString() })
+      .update({ status: 'completed' as const, completed_at: new Date().toISOString() })
       .eq('id', deadlineId)
     fetchDeadlines()
   }

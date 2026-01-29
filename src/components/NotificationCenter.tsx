@@ -77,7 +77,7 @@ export default function NotificationCenter() {
   async function markComplete(id: string) {
     await supabase
       .from('client_deadlines')
-      .update({ status: 'completed', completed_at: new Date().toISOString() })
+      .update({ status: 'completed' as const, completed_at: new Date().toISOString() })
       .eq('id', id)
     fetchUpcoming()
   }

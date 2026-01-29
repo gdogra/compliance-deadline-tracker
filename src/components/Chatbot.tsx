@@ -300,7 +300,7 @@ export default function Chatbot() {
     if (action.type === 'complete' && action.deadlineId) {
       await supabase
         .from('client_deadlines')
-        .update({ status: 'completed', completed_at: new Date().toISOString() })
+        .update({ status: 'completed' as const, completed_at: new Date().toISOString() })
         .eq('id', action.deadlineId)
       
       setMessages(prev => [...prev, {

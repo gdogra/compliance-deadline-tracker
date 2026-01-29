@@ -61,7 +61,7 @@ export default function Dashboard() {
     const { error } = await supabase
       .from('client_deadlines')
       .update({ 
-        status: 'completed',
+        status: 'completed' as const,
         completed_at: new Date().toISOString()
       })
       .eq('id', deadlineId)
@@ -77,7 +77,7 @@ export default function Dashboard() {
     const { error } = await supabase
       .from('client_deadlines')
       .update({ 
-        status: 'completed',
+        status: 'completed' as const,
         completed_at: new Date().toISOString()
       })
       .in('id', Array.from(selectedIds))
