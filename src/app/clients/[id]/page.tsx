@@ -81,8 +81,8 @@ export default function ClientDetailPage() {
   async function markExtended(deadlineId: string) {
     const extendedDate = prompt('Enter new due date (YYYY-MM-DD):')
     if (extendedDate) {
-      await supabase
-        .from('client_deadlines')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabase.from('client_deadlines') as any)
         .update({ status: 'extended', extended_to: extendedDate })
         .eq('id', deadlineId)
       fetchDeadlines()
