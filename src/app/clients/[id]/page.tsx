@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Client, ClientDeadline, DeadlineStatus, Database } from '@/types/database'
+import { Client, ClientDeadline, DeadlineStatus } from '@/types/database'
 import { format, isPast, isToday } from 'date-fns'
 import { 
   Calendar, ArrowLeft, Building2, User, MapPin, Mail, Phone, 
@@ -74,9 +74,9 @@ export default function ClientDetailPage() {
     await supabase
       .from('client_deadlines')
       .update({ 
-        status: 'completed' as DeadlineStatus, 
+        status: 'completed', 
         completed_at: new Date().toISOString() 
-      } as Database['public']['Tables']['client_deadlines']['Update'])
+      } as { status: DeadlineStatus; completed_at: string })
       .eq('id', deadlineId)
     fetchDeadlines()
   }

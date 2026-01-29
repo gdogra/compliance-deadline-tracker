@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { ClientDeadline, Client, DeadlineStatus, Database } from '@/types/database'
+import { ClientDeadline, Client, DeadlineStatus } from '@/types/database'
 import { format, isToday, isTomorrow, isThisWeek, isPast, addDays } from 'date-fns'
 import { 
   Calendar, Bell, CheckCircle, Clock, AlertTriangle, 
@@ -61,9 +61,9 @@ export default function Dashboard() {
     const { error } = await supabase
       .from('client_deadlines')
       .update({ 
-        status: 'completed' as DeadlineStatus,
+        status: 'completed',
         completed_at: new Date().toISOString()
-      } as Database['public']['Tables']['client_deadlines']['Update'])
+      } as { status: DeadlineStatus; completed_at: string })
       .eq('id', deadlineId)
 
     if (!error) {
@@ -77,9 +77,9 @@ export default function Dashboard() {
     const { error } = await supabase
       .from('client_deadlines')
       .update({ 
-        status: 'completed' as DeadlineStatus,
+        status: 'completed',
         completed_at: new Date().toISOString()
-      } as Database['public']['Tables']['client_deadlines']['Update'])
+      } as { status: DeadlineStatus; completed_at: string })
       .in('id', Array.from(selectedIds))
 
     if (!error) {

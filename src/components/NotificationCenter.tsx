@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { ClientDeadline, Client, DeadlineStatus, Database } from '@/types/database'
+import { ClientDeadline, Client, DeadlineStatus } from '@/types/database'
 import { format, isPast, isToday, isTomorrow, addDays } from 'date-fns'
 import { Bell, AlertTriangle, Clock, Calendar, X, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -78,9 +78,9 @@ export default function NotificationCenter() {
     await supabase
       .from('client_deadlines')
       .update({ 
-        status: 'completed' as DeadlineStatus, 
+        status: 'completed', 
         completed_at: new Date().toISOString() 
-      } as Database['public']['Tables']['client_deadlines']['Update'])
+      } as { status: DeadlineStatus; completed_at: string })
       .eq('id', id)
     fetchUpcoming()
   }
