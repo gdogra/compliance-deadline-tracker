@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { ClientDeadline } from '@/types/database'
+import { ClientDeadline, User } from '@/types/database'
 import { format, subMonths, startOfMonth, endOfMonth, eachMonthOfInterval } from 'date-fns'
 import { Calendar, TrendingUp, PieChart, BarChart3, CheckCircle, AlertTriangle, Clock } from 'lucide-react'
 import Link from 'next/link'
@@ -19,10 +19,25 @@ export default function AnalyticsPage() {
 
   async function fetchAllDeadlines() {
     setLoading(true)
+
+    const supabase = createClient()
+    const { data: userData } = await supabase.auth.getUser()
+
+    if (!userData?.user?.id) {
+      console.error('No user ID found')
+      setLoading(false)
+      return
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data } = await (supabase.from('client_deadlines') as any)
       .select('*')
+      .eq('firm_id', userData.user.firm_id)
       .order('due_date', { ascending: true })
+
+    setDeadlines(data || [])
+    setLoading(false)
+  }
 
     setDeadlines(data || [])
     setLoading(false)
