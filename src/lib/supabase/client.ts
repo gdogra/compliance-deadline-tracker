@@ -5,25 +5,40 @@ export function createClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  // During build time, env vars may not be available
-  // Return a mock client that won't be used during static generation
-  if (!supabaseUrl || !supabaseKey) {
-    // Return a minimal mock for build-time safety
+  // Only use mock during server-side build (not in browser)
+  if (typeof window === 'undefined' && (!supabaseUrl || !supabaseKey)) {
+    // Return a minimal mock for build-time safety only
     return {
       from: () => ({
-        select: () => ({ data: null, error: null }),
-        insert: () => ({ data: null, error: null }),
-        update: () => ({ data: null, error: null }),
-        delete: () => ({ data: null, error: null }),
+        select: () => Promise.resolve({ data: [], error: null }),
+        insert: () => Promise.resolve({ data: null, error: null }),
+        update: () => Promise.resolve({ data: null, error: null }),
+        delete: () => Promise.resolve({ data: null, error: null }),
+        eq: function() { return this },
+        neq: function() { return this },
+        gt: function() { return this },
+        gte: function() { return this },
+        lt: function() { return this },
+        lte: function() { return this },
+        order: function() { return this },
+        limit: function() { return this },
+        single: function() { return Promise.resolve({ data: null, error: null }) },
+        in: function() { return this },
       }),
       auth: {
-        getUser: () => ({ data: { user: null }, error: null }),
-        signInWithPassword: () => ({ data: null, error: null }),
-        signUp: () => ({ data: null, error: null }),
-        signOut: () => ({ error: null }),
+        getUser: () => Promise.resolve({ data: { user: null }, error: null }),
+        signInWithPassword: () => Promise.resolve({ data: null, error: null }),
+        signUp: () => Promise.resolve({ data: null, error: null }),
+        signOut: () => Promise.resolve({ error: null }),
       },
-      rpc: () => ({ data: null, error: null }),
+      rpc: () => Promise.resolve({ data: null, error: null }),
     } as unknown as ReturnType<typeof createBrowserClient<Database>>
+  }
+
+  // In browser or when env vars are available, create real client
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('Supabase credentials missing. Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY')
+    throw new Error('Supabase credentials not configured')
   }
 
   return createBrowserClient<Database>(supabaseUrl, supabaseKey)
