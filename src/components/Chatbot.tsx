@@ -189,8 +189,8 @@ export default function Chatbot() {
       dateLabel = 'this month'
     }
 
-    const { data: deadlines } = await supabase
-      .from('client_deadlines')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: deadlines } = await (supabase.from('client_deadlines') as any)
       .select('*, clients(name)')
       .neq('status', 'completed')
       .order('due_date', { ascending: true })
@@ -201,13 +201,17 @@ export default function Chatbot() {
     }
 
     // Filter based on query
-    let filtered = deadlines
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let filtered: any[] = deadlines || []
     if (query.includes('today')) {
-      filtered = deadlines.filter(d => isToday(new Date(d.due_date)))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      filtered = deadlines.filter((d: any) => isToday(new Date(d.due_date)))
     } else if (query.includes('tomorrow')) {
-      filtered = deadlines.filter(d => isTomorrow(new Date(d.due_date)))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      filtered = deadlines.filter((d: any) => isTomorrow(new Date(d.due_date)))
     } else if (query.includes('week')) {
-      filtered = deadlines.filter(d => isThisWeek(new Date(d.due_date)))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      filtered = deadlines.filter((d: any) => isThisWeek(new Date(d.due_date)))
     }
 
     if (filtered.length === 0) {
@@ -227,8 +231,8 @@ export default function Chatbot() {
   }
 
   async function handleOverdueQuery(): Promise<{ content: string; actions?: ChatAction[] }> {
-    const { data: deadlines } = await supabase
-      .from('client_deadlines')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: deadlines } = await (supabase.from('client_deadlines') as any)
       .select('*, clients(name)')
       .neq('status', 'completed')
       .lt('due_date', format(new Date(), 'yyyy-MM-dd'))
@@ -239,7 +243,8 @@ export default function Chatbot() {
       return { content: "No overdue deadlines! You're on top of everything. 🌟" }
     }
 
-    const content = deadlines.slice(0, 5).map(d => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const content = deadlines.slice(0, 5).map((d: any) => {
       const dueDate = new Date(d.due_date)
       return `🔴 **${d.name}** - ${(d.clients as any)?.name || 'Unknown'}\n   Was due: ${format(dueDate, 'MMM d, yyyy')} • ${d.form_number || d.jurisdiction}`
     }).join('\n\n')
@@ -269,8 +274,8 @@ export default function Chatbot() {
   }
 
   async function handleClientQuery(query: string): Promise<{ content: string; actions?: ChatAction[] }> {
-    const { data: clients } = await supabase
-      .from('clients')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: clients } = await (supabase.from('clients') as any)
       .select('id, name, entity_type, states')
       .eq('is_active', true)
       .order('name')
@@ -283,7 +288,8 @@ export default function Chatbot() {
       }
     }
 
-    const content = clients.map(c => 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const content = clients.map((c: any) => 
       `• **${c.name}** (${c.entity_type}) - ${c.states?.join(', ') || 'No states'}`
     ).join('\n')
 

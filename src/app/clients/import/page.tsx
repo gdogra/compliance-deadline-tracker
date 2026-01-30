@@ -109,12 +109,13 @@ export default function ImportClientsPage() {
     let errors = 0
 
     // Get or create a demo firm
-    const { data: firms } = await supabase.from('firms').select('id').limit(1)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: firms } = await (supabase.from('firms') as any).select('id').limit(1)
     let firmId = firms?.[0]?.id
 
     if (!firmId) {
-      const { data: newFirm } = await supabase
-        .from('firms')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: newFirm } = await (supabase.from('firms') as any)
         .insert({ name: 'My Firm' })
         .select()
         .single()
@@ -129,8 +130,8 @@ export default function ImportClientsPage() {
 
       const states = row.states.split(',').map(s => s.trim().toUpperCase()).filter(Boolean)
 
-      const { data: client, error } = await supabase
-        .from('clients')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: client, error } = await (supabase.from('clients') as any)
         .insert({
           firm_id: firmId,
           name: row.name,
@@ -151,7 +152,8 @@ export default function ImportClientsPage() {
         imported++
         // Generate deadlines
         const currentYear = new Date().getFullYear()
-        await supabase.rpc('generate_client_deadlines', {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase as any).rpc('generate_client_deadlines', {
           p_client_id: client.id,
           p_year: currentYear
         })
@@ -290,7 +292,7 @@ export default function ImportClientsPage() {
                           {row.valid ? (
                             <CheckCircle className="h-4 w-4 text-green-500" />
                           ) : (
-                            <AlertTriangle className="h-4 w-4 text-red-500" title={row.error} />
+                            <span title={row.error}><AlertTriangle className="h-4 w-4 text-red-500" /></span>
                           )}
                         </td>
                         <td className="px-3 py-2 font-medium text-slate-900 dark:text-white">{row.name}</td>

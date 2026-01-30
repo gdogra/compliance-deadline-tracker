@@ -34,8 +34,8 @@ export default function NewDeadlinePage() {
   }, [])
 
   async function fetchClients() {
-    const { data } = await supabase
-      .from('clients')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (supabase.from('clients') as any)
       .select('*')
       .eq('is_active', true)
       .order('name')
@@ -52,8 +52,8 @@ export default function NewDeadlinePage() {
     setLoading(true)
     setError(null)
 
-    const { error: insertError } = await supabase
-      .from('client_deadlines')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: insertError } = await (supabase.from('client_deadlines') as any)
       .insert({
         ...formData,
         status: 'pending',

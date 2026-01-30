@@ -19,8 +19,8 @@ export default function AnalyticsPage() {
 
   async function fetchAllDeadlines() {
     setLoading(true)
-    const { data } = await supabase
-      .from('client_deadlines')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (supabase.from('client_deadlines') as any)
       .select('*')
       .order('due_date', { ascending: true })
 

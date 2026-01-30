@@ -30,8 +30,8 @@ export default function ActivityPage() {
 
   async function fetchDeadlines() {
     setLoading(true)
-    const { data } = await supabase
-      .from('client_deadlines')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (supabase.from('client_deadlines') as any)
       .select('*, clients(*)')
       .order('updated_at', { ascending: false })
       .limit(100)

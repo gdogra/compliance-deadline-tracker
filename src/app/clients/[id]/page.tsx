@@ -44,8 +44,8 @@ export default function ClientDetailPage() {
 
   async function fetchClient() {
     if (!clientId) return
-    const { data, error } = await supabase
-      .from('clients')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.from('clients') as any)
       .select('*')
       .eq('id', clientId)
       .single()
@@ -58,8 +58,8 @@ export default function ClientDetailPage() {
   async function fetchDeadlines() {
     if (!clientId) return
     setLoading(true)
-    const { data, error } = await supabase
-      .from('client_deadlines')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.from('client_deadlines') as any)
       .select('*')
       .eq('client_id', clientId)
       .order('due_date', { ascending: true })

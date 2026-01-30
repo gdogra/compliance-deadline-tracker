@@ -40,8 +40,8 @@ export default function Dashboard() {
 
   async function fetchDeadlines() {
     setLoading(true)
-    const { data, error } = await supabase
-      .from('client_deadlines')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.from('client_deadlines') as any)
       .select(`
         *,
         clients (*)

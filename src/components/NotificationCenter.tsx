@@ -37,8 +37,8 @@ export default function NotificationCenter() {
     setLoading(true)
     const nextWeek = format(addDays(new Date(), 7), 'yyyy-MM-dd')
     
-    const { data } = await supabase
-      .from('client_deadlines')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (supabase.from('client_deadlines') as any)
       .select('*, clients(*)')
       .neq('status', 'completed')
       .lte('due_date', nextWeek)

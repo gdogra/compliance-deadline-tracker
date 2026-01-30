@@ -31,8 +31,8 @@ export default function CalendarPage() {
     const start = format(startOfMonth(currentMonth), 'yyyy-MM-dd')
     const end = format(endOfMonth(currentMonth), 'yyyy-MM-dd')
 
-    const { data, error } = await supabase
-      .from('client_deadlines')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.from('client_deadlines') as any)
       .select('*, clients(*)')
       .gte('due_date', start)
       .lte('due_date', end)

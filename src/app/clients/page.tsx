@@ -31,8 +31,8 @@ export default function ClientsPage() {
 
   async function fetchClients() {
     setLoading(true)
-    const { data, error } = await supabase
-      .from('clients')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase.from('clients') as any)
       .select('*')
       .eq('is_active', true)
       .order('name', { ascending: true })

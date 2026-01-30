@@ -27,8 +27,8 @@ export default function ReportsPage() {
 
   async function fetchDeadlines() {
     setLoading(true)
-    const { data } = await supabase
-      .from('client_deadlines')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (supabase.from('client_deadlines') as any)
       .select('*, clients(*)')
       .order('due_date', { ascending: false })
 
