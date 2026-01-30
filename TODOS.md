@@ -7,7 +7,6 @@
 
 ### MEDIUM Priority
 - [ ] Build secure messaging and document sharing for clients.
-- [ ] Implement customizable email/SMS reminders for clients.
 - [ ] Add integrated payment processing and tracking.
 - [ ] Implement workflow automation with checklists.
 
