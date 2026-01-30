@@ -52,6 +52,38 @@ export default function AnalyticsPage() {
   // Monthly completion trend (last 6 months)
   const sixMonthsAgo = subMonths(new Date(), 6)
   const months = eachMonthOfInterval({ start: sixMonthsAgo, end: new Date() })
+
+  const monthlyTrend = months.map(month => {
+    const monthStart = startOfMonth(month)
+    const monthEnd = endOfMonth(month)
+
+    const monthDeadlines = deadlines.filter(d => {
+      const dueDate = new Date(d.due_date)
+      return dueDate >= monthStart && dueDate <= monthEnd
+    })
+
+    const completed = monthDeadlines.filter(d => d.status === 'completed').length
+    const missed = monthDeadlines.filter(d => d.status === 'missed').length
+    const pending = monthDeadlines.filter(d => d.status === 'pending' || d.status === 'in_progress').length
+    const extended = monthDeadlines.filter(d => d.status === 'extended').length
+    const total = monthDeadlines.length
+
+    return {
+      month: format(month, 'MMM'),
+      completed,
+      missed,
+      pending,
+      extended,
+      total
+    }
+  })
+
+  const maxTotal = Math.max(...monthlyTrend.map(m => m.total), 1)
+  const completionRate = totalDeadlines > 0 ? Math.round((completedDeadlines / totalDeadlines) * 100) : 0
+
+  // Monthly completion trend (last 6 months)
+  const sixMonthsAgo = subMonths(new Date(), 6)
+  const months = eachMonthOfInterval({ start: sixMonthsAgo, end: new Date() })
   
   const monthlyTrend = months.map(month => {
     const monthStart = startOfMonth(month)
@@ -63,11 +95,17 @@ export default function AnalyticsPage() {
     })
     
     const completed = monthDeadlines.filter(d => d.status === 'completed').length
+    const missed = monthDeadlines.filter(d => d.status === 'missed').length
+    const pending = monthDeadlines.filter(d => d.status === 'pending' || d.status === 'in_progress').length
+    const extended = monthDeadlines.filter(d => d.status === 'extended').length
     const total = monthDeadlines.length
     
     return {
       month: format(month, 'MMM'),
       completed,
+      missed,
+      pending,
+      extended,
       total,
       rate: total > 0 ? Math.round((completed / total) * 100) : 0
     }
@@ -195,33 +233,55 @@ export default function AnalyticsPage() {
               {/* Monthly Trend */}
               <div className="bg-white rounded-xl border border-slate-200 p-6">
                 <h3 className="font-semibold text-slate-900 mb-4">Monthly Trend (Last 6 Months)</h3>
-                <div className="space-y-3">
-                  {monthlyTrend.map((month) => (
-                    <div key={month.month} className="flex items-center gap-4">
-                      <span className="w-10 text-sm text-slate-500">{month.month}</span>
-                      <div className="flex-1 h-8 bg-slate-100 rounded-lg overflow-hidden flex">
-                        <div 
-                          className="bg-green-500 h-full transition-all"
-                          style={{ width: `${(month.completed / maxTotal) * 100}%` }}
-                        />
-                        <div 
-                          className="bg-slate-300 h-full transition-all"
-                          style={{ width: `${((month.total - month.completed) / maxTotal) * 100}%` }}
-                        />
+                <div className="flex items-end justify-between gap-2 h-40">
+                  {monthlyTrend.map((month) => {
+                    const totalHeight = (month.total / maxTotal) * 100
+                    const completedHeight = (month.completed / maxTotal) * 100
+                    const missedHeight = (month.missed / maxTotal) * 100
+                    const pendingHeight = (month.pending / maxTotal) * 100
+                    const extendedHeight = (month.extended / maxTotal) * 100
+
+                    return (
+                      <div key={month.month} className="flex-1 flex flex-col items-center gap-2">
+                        <div className="w-full flex flex-col items-center justify-end h-32">
+                          <div 
+                            className="w-full flex flex-col items-center justify-end h-full"
+                          >
+                            <div
+                              className="bg-green-500 w-full transition-all origin-bottom"
+                              style={{ height: `${completedHeight}%` }}
+                            />
+                            <div
+                              className="bg-red-500 w-full transition-all origin-bottom"
+                              style={{ height: `${missedHeight}%` }}
+                            />
+                            <div
+                              className="bg-blue-500 w-full transition-all origin-bottom"
+                              style={{ height: `${pendingHeight}%` }}
+                            />
+                            <div
+                              className="bg-orange-500 w-full transition-all origin-bottom"
+                              style={{ height: `${extendedHeight}%` }}
+                            />
+                          </div>
+                        </div>
+                        <span className="text-xs text-slate-500">{month.month}</span>
                       </div>
-                      <span className="w-16 text-right text-sm">
-                        <span className="text-green-600 font-medium">{month.completed}</span>
-                        <span className="text-slate-400">/{month.total}</span>
-                      </span>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
                 <div className="flex items-center gap-4 mt-4 text-xs text-slate-500">
                   <span className="flex items-center gap-1">
                     <span className="w-3 h-3 bg-green-500 rounded"></span> Completed
                   </span>
                   <span className="flex items-center gap-1">
-                    <span className="w-3 h-3 bg-slate-300 rounded"></span> Incomplete
+                    <span className="w-3 h-3 bg-red-500 rounded"></span> Missed
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-3 h-3 bg-blue-500 rounded"></span> Pending
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-3 h-3 bg-orange-500 rounded"></span> Extended
                   </span>
                 </div>
               </div>
