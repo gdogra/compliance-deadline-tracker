@@ -7,7 +7,7 @@ import {
   format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, 
   isSameDay, addMonths, subMonths, isToday, isPast
 } from 'date-fns'
-import { Calendar, ChevronLeft, ChevronRight, X, Activity } from 'lucide-react'
+import { Calendar, ChevronLeft, ChevronRight, X, Activity, Brain } from 'lucide-react'
 import Link from 'next/link'
 
 type DeadlineWithClient = ClientDeadline & {
@@ -80,6 +80,7 @@ export default function CalendarPage() {
               <Link href="/calendar" className="text-blue-600 font-medium">Calendar</Link>
               <Link href="/clients" className="text-slate-600 hover:text-slate-900">Clients</Link>
               <Link href="/compliance-intelligence" className="text-slate-600 hover:text-slate-900">Compliance Intelligence</Link>
+              <Link href="/ai-insights" className="text-blue-600 font-medium">AI Insights</Link>
               <Link href="/settings" className="text-slate-600 hover:text-slate-900">Settings</Link>
             </nav>
           </div>

@@ -14,7 +14,8 @@ import {
   CheckCircle, 
   Activity,
   Target,
-  Award
+  Award,
+  Brain
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -138,6 +139,7 @@ export default function ComplianceIntelligencePage() {
               <Link href="/calendar" className="text-slate-600 hover:text-slate-900">Calendar</Link>
               <Link href="/analytics" className="text-slate-600 hover:text-slate-900">Analytics</Link>
               <Link href="/compliance-intelligence" className="text-blue-600 font-medium">Compliance Intelligence</Link>
+              <Link href="/ai-insights" className="text-slate-600 hover:text-slate-900">AI Insights</Link>
               <Link href="/clients" className="text-slate-600 hover:text-slate-900">Clients</Link>
               <Link href="/settings" className="text-slate-600 hover:text-slate-900">Settings</Link>
             </nav>
