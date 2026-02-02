@@ -203,6 +203,9 @@ export default function Dashboard() {
                 <Activity className="h-4 w-4" />
               </Link>
               <Link href="/clients" className="text-slate-600 hover:text-slate-900 dark:text-slate-300">Clients</Link>
+              <Link href="/compliance-intelligence" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 flex items-center gap-1">
+                <Activity className="h-4 w-4" />
+              </Link>
               <Link href="/settings" className="text-slate-600 hover:text-slate-900 dark:text-slate-300">Settings</Link>
               <NotificationCenter />
               <ThemeToggle />

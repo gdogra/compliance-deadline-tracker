@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Calendar, Bell, Users, CheckCircle, ArrowRight, Shield } from 'lucide-react'
+import { Calendar, Bell, Users, CheckCircle, ArrowRight, Shield, Activity } from 'lucide-react'
 
 export default function Home() {
   return (
@@ -144,6 +144,16 @@ export default function Home() {
               <h3 className="text-xl font-semibold mb-2">Calendar Sync</h3>
               <p className="text-slate-600">
                 Google Calendar, Outlook, iCal integration. See deadlines wherever you work.
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border border-slate-200 hover:shadow-lg transition">
+              <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
+                <Activity className="h-6 w-6 text-emerald-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Compliance Intelligence</h3>
+              <p className="text-slate-600">
+                Track regulatory changes, benchmark against peers, and optimize costs with AI-powered insights.
               </p>
             </div>
           </div>

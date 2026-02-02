@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Calendar, Bell, User, Building2, CreditCard, Mail, Phone, Save, Check } from 'lucide-react'
+import { Calendar, Bell, User, Building2, CreditCard, Mail, Phone, Save, Check, Activity } from 'lucide-react'
 import Link from 'next/link'
 
 export default function SettingsPage() {
@@ -33,6 +33,7 @@ export default function SettingsPage() {
             <nav className="flex items-center gap-6">
               <Link href="/dashboard" className="text-slate-600 hover:text-slate-900">Dashboard</Link>
               <Link href="/clients" className="text-slate-600 hover:text-slate-900">Clients</Link>
+              <Link href="/compliance-intelligence" className="text-slate-600 hover:text-slate-900">Compliance Intelligence</Link>
               <Link href="/settings" className="text-blue-600 font-medium">Settings</Link>
               <div className="w-8 h-8 bg-slate-200 rounded-full"></div>
             </nav>

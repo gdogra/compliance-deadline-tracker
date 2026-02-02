@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Client } from '@/types/database'
-import { Calendar, Plus, Search, Building2, User, MapPin, ChevronRight } from 'lucide-react'
+import { Calendar, Plus, Search, Building2, User, MapPin, ChevronRight, Activity } from 'lucide-react'
 import Link from 'next/link'
 
 const ENTITY_LABELS: Record<string, string> = {
@@ -63,7 +63,8 @@ export default function ClientsPage() {
             </div>
             <nav className="flex items-center gap-6">
               <Link href="/dashboard" className="text-slate-600 hover:text-slate-900">Dashboard</Link>
-              <Link href="/clients" className="text-blue-600 font-medium">Clients</Link>
+              <Link href="/clients" className="text-slate-600 hover:text-slate-900">Clients</Link>
+              <Link href="/compliance-intelligence" className="text-blue-600 font-medium">Compliance Intelligence</Link>
               <Link href="/settings" className="text-slate-600 hover:text-slate-900">Settings</Link>
               <div className="w-8 h-8 bg-slate-200 rounded-full"></div>
             </nav>

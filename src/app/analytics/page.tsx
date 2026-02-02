@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { ClientDeadline, User } from '@/types/database'
 import { format, subMonths, startOfMonth, endOfMonth, eachMonthOfInterval } from 'date-fns'
-import { Calendar, TrendingUp, PieChart, BarChart3, CheckCircle, AlertTriangle, Clock } from 'lucide-react'
+import { Calendar, TrendingUp, PieChart, BarChart3, CheckCircle, AlertTriangle, Clock, Activity } from 'lucide-react'
 import Link from 'next/link'
 
 export default function AnalyticsPage() {
@@ -141,7 +141,8 @@ export default function AnalyticsPage() {
             <nav className="flex items-center gap-6">
               <Link href="/dashboard" className="text-slate-600 hover:text-slate-900">Dashboard</Link>
               <Link href="/calendar" className="text-slate-600 hover:text-slate-900">Calendar</Link>
-              <Link href="/analytics" className="text-blue-600 font-medium">Analytics</Link>
+              <Link href="/analytics" className="text-slate-600 hover:text-slate-900">Analytics</Link>
+              <Link href="/compliance-intelligence" className="text-blue-600 font-medium">Compliance Intelligence</Link>
               <Link href="/clients" className="text-slate-600 hover:text-slate-900">Clients</Link>
               <Link href="/settings" className="text-slate-600 hover:text-slate-900">Settings</Link>
             </nav>

@@ -1,0 +1,46 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+import { getAuthorizationUrl } from '@/lib/integrations/slack'
+import { cookies } from 'next/headers'
+import { v4 as uuidv4 } from 'crypto'
+
+export async function GET(request: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  const { data: userData } = await supabase
+    .from('users')
+    .select('firm_id')
+    .eq('id', user.id)
+    .single()
+
+  if (!userData?.firm_id) {
+    return NextResponse.json({ error: 'No firm associated with user' }, { status: 400 })
+  }
+
+  const state = uuidv4()
+  
+  const cookieStore = await cookies()
+  cookieStore.set('slack_oauth_state', JSON.stringify({
+    state,
+    firm_id: userData.firm_id,
+  }), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 600,
+    path: '/',
+  })
+
+  const config = {
+    clientId: process.env.SLACK_CLIENT_ID || '',
+    clientSecret: process.env.SLACK_CLIENT_SECRET || '',
+    redirectUri: `${process.env.NEXT_PUBLIC_APP_URL}/api/integrations/slack/callback`,
+  }
+
+  const authUrl = getAuthorizationUrl(config, state)
+  return NextResponse.redirect(authUrl)
+}
