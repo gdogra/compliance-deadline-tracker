@@ -114,7 +114,22 @@ export async function upsertIntegration(integration: Partial<IntegrationConfig> 
 
   // if (error) throw error
   // return data as IntegrationConfig
-  throw new Error('Integration table not yet implemented')
+  
+  // Return mock data for now
+  return {
+    id: 'mock-id',
+    firm_id: integration.firm_id,
+    provider: integration.provider,
+    status: 'disconnected',
+    access_token: undefined,
+    refresh_token: undefined,
+    token_expires_at: undefined,
+    settings: {},
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    last_sync_at: undefined,
+    last_error: undefined
+  } as IntegrationConfig
 }
 
 export async function disconnectIntegration(firmId: string, provider: IntegrationProvider): Promise<void> {
