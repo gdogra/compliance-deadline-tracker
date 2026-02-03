@@ -4,7 +4,7 @@ import { ClientDeadline, Client } from '@/types/database'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     
     // Get user session to verify access
     const { data: { user } } = await supabase.auth.getUser()
@@ -12,14 +12,52 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // First get the user's profile to get firm_id
+    const { data: userProfile, error } = await supabase
+      .from('users')
+      .select('firm_id')
+      .eq('id', user.id)
+      .single()
+
+    if (error || !userProfile) {
+      return Response.json({ error: 'User profile not found' }, { status: 404 })
+    }
+
+    const firmId = (userProfile as { firm_id: string }).firm_id
+    if (!firmId) {
+      return Response.json({ error: 'No firm ID found for user' }, { status: 403 })
+    }
+
+    // Get all clients for the user's firm first
+    const { data: clients } = await supabase
+      .from('clients')
+      .select('id')
+      .eq('firm_id', firmId)
+
+    if (!clients || clients.length === 0) {
+      return Response.json({ 
+        success: true, 
+        risk_scores: [],
+        summary: {
+          total_deadlines: 0,
+          high_risk_count: 0,
+          medium_risk_count: 0,
+          low_risk_count: 0
+        },
+        timestamp: new Date().toISOString()
+      })
+    }
+
+    const clientIds = (clients as { id: string }[]).map(client => client.id)
+
     // Get client deadlines for the user's firm
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: deadlines } = await (supabase.from('client_deadlines') as any)
+    const { data: deadlines } = await supabase
+      .from('client_deadlines')
       .select(`
         *,
         clients (*)
       `)
-      .eq('firm_id', user.firm_id)
+      .in('client_id', clientIds)
       .gt('due_date', new Date().toISOString())
 
     if (!deadlines) {

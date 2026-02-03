@@ -53,25 +53,26 @@ export async function GET(request: NextRequest) {
 
     const tokens = await exchangeCodeForTokens(config, code, realmId)
 
-    // Store integration in database
+    // TODO: Store integration in database
+    // Table 'integrations' needs to be created first
     const supabase = await createClient()
-    await supabase.from('integrations').upsert({
-      firm_id,
-      provider: 'quickbooks',
-      status: 'connected',
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token,
-      token_expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
-      settings: {
-        realm_id: realmId,
-        auto_import_clients: true,
-        sync_frequency: 'daily',
-        import_inactive_clients: false,
-      },
-      updated_at: new Date().toISOString(),
-    }, {
-      onConflict: 'firm_id,provider',
-    })
+    // await supabase.from('integrations').upsert({
+    //   firm_id,
+    //   provider: 'quickbooks',
+    //   status: 'connected',
+    //   access_token: tokens.access_token,
+    //   refresh_token: tokens.refresh_token,
+    //   token_expires_at: new Date(Date.now() + tokens.expires_in * 1000).toISOString(),
+    //   settings: {
+    //     realm_id: realmId,
+    //     auto_import_clients: true,
+    //     sync_frequency: 'daily',
+    //     import_inactive_clients: false,
+    //   },
+    //   updated_at: new Date().toISOString(),
+    // }, {
+    //   onConflict: 'firm_id,provider',
+    // })
 
     return NextResponse.redirect(
       new URL('/integrations?success=quickbooks', request.url)

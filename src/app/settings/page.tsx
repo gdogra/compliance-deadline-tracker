@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { Calendar, Bell, User, Building2, CreditCard, Mail, Phone, Save, Check, Activity, Brain } from 'lucide-react'
 import Link from 'next/link'
 
 export default function SettingsPage() {
+  const supabase = createClient();
   const [saved, setSaved] = useState(false)
   const [settings, setSettings] = useState({
     firmName: 'Demo Firm',
@@ -36,6 +38,17 @@ export default function SettingsPage() {
               <Link href="/compliance-intelligence" className="text-slate-600 hover:text-slate-900">Compliance Intelligence</Link>
               <Link href="/ai-insights" className="text-blue-600 font-medium">AI Insights</Link>
               <Link href="/settings" className="text-blue-600 font-medium">Settings</Link>
+              <button 
+                onClick={async () => {
+                  const { error } = await supabase.auth.signOut();
+                  if (!error) {
+                    window.location.href = '/login';
+                  }
+                }}
+                className="text-slate-600 hover:text-red-600 font-medium"
+              >
+                Logout
+              </button>
               <div className="w-8 h-8 bg-slate-200 rounded-full"></div>
             </nav>
           </div>

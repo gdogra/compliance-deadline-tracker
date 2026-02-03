@@ -4,7 +4,7 @@ import { Client, ClientDeadline } from '@/types/database'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     
     // Get user session to verify access
     const { data: { user } } = await supabase.auth.getUser()
@@ -12,26 +12,58 @@ export async function GET(request: NextRequest) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // First get the user's profile to get firm_id
+    const { data: userProfile, error } = await supabase
+      .from('users')
+      .select('firm_id')
+      .eq('id', user.id)
+      .single()
+
+    if (error || !userProfile) {
+      return Response.json({ error: 'User profile not found' }, { status: 404 })
+    }
+
+    const firmId = (userProfile as { firm_id: string }).firm_id
+    if (!firmId) {
+      return Response.json({ error: 'No firm ID found for user' }, { status: 403 })
+    }
+
+    // Get all clients for the user's firm first
+    const { data: clients } = await supabase
+      .from('clients')
+      .select('*')
+      .eq('firm_id', firmId)
+
+    if (!clients || clients.length === 0) {
+      return Response.json({ 
+        success: true, 
+        anomalies: [],
+        summary: {
+          total_anomalies: 0,
+          high_priority_count: 0,
+          medium_priority_count: 0,
+          low_priority_count: 0
+        },
+        timestamp: new Date().toISOString()
+      })
+    }
+
+    const clientIds = (clients as { id: string }[]).map(client => client.id)
+
     // Get all client deadlines for the user's firm
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: deadlines } = await (supabase.from('client_deadlines') as any)
+    const { data: deadlines } = await supabase
+      .from('client_deadlines')
       .select(`
         *,
         clients (*)
       `)
-      .eq('firm_id', user.firm_id)
+      .in('client_id', clientIds)
       .order('created_at', { ascending: false })
       .limit(1000) // Limit to recent deadlines for performance
 
     if (!deadlines) {
       return Response.json({ error: 'Failed to fetch deadlines' }, { status: 500 })
     }
-
-    // Get client data to enrich the analysis
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: clients } = await (supabase.from('clients') as any)
-      .select('*')
-      .eq('firm_id', user.firm_id)
 
     // Perform anomaly detection
     const anomalies = detectAnomalies(deadlines as (ClientDeadline & { clients: Client })[], clients || [])
@@ -54,7 +86,7 @@ export async function GET(request: NextRequest) {
 }
 
 function detectAnomalies(deadlines: (ClientDeadline & { clients: Client })[], clients: Client[]) {
-  const anomalies = []
+  const anomalies: any[] = []
   
   // Group deadlines by client to analyze patterns
   const deadlinesByClient = deadlines.reduce((acc, deadline) => {
@@ -210,7 +242,7 @@ function detectAnomalies(deadlines: (ClientDeadline & { clients: Client })[], cl
   
   // Sort anomalies by priority and recency
   return anomalies.sort((a, b) => {
-    const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 }
+    const priorityOrder: { [key: string]: number } = { critical: 4, high: 3, medium: 2, low: 1 }
     // Primary sort: priority
     const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority]
     if (priorityDiff !== 0) return priorityDiff

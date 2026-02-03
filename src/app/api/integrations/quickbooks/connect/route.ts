@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getAuthorizationUrl } from '@/lib/integrations/quickbooks'
 import { cookies } from 'next/headers'
-import { v4 as uuidv4 } from 'crypto'
+import { randomUUID as uuidv4 } from 'crypto'
 
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
@@ -19,7 +19,12 @@ export async function GET(request: NextRequest) {
     .eq('id', user.id)
     .single()
 
-  if (!userData?.firm_id) {
+  if (!userData) {
+    return NextResponse.json({ error: 'No firm associated with user' }, { status: 400 })
+  }
+
+  const firmId = (userData as { firm_id: string }).firm_id
+  if (!firmId) {
     return NextResponse.json({ error: 'No firm associated with user' }, { status: 400 })
   }
 
@@ -29,7 +34,7 @@ export async function GET(request: NextRequest) {
   const cookieStore = await cookies()
   cookieStore.set('qb_oauth_state', JSON.stringify({
     state,
-    firm_id: userData.firm_id,
+    firm_id: firmId,
   }), {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

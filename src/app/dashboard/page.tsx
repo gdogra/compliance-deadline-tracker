@@ -210,6 +210,17 @@ export default function Dashboard() {
                 <Brain className="h-4 w-4" />
               </Link>
               <Link href="/settings" className="text-slate-600 hover:text-slate-900 dark:text-slate-300">Settings</Link>
+              <button 
+                onClick={async () => {
+                  const { error } = await supabase.auth.signOut();
+                  if (!error) {
+                    window.location.href = '/login';
+                  }
+                }}
+                className="text-slate-600 hover:text-red-600 dark:text-slate-300 dark:hover:text-red-400 font-medium"
+              >
+                Logout
+              </button>
               <NotificationCenter />
               <ThemeToggle />
               <kbd className="hidden md:inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-slate-400 bg-slate-100 dark:bg-slate-700 rounded">

@@ -4,7 +4,7 @@ import { Client } from '@/types/database'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     
     // Get user session to verify access
     const { data: { user } } = await supabase.auth.getUser()

@@ -50,24 +50,26 @@ export async function GET(request: NextRequest) {
     const tokens = await exchangeCodeForTokens(config, code)
 
     const supabase = await createClient()
-    await supabase.from('integrations').upsert({
-      firm_id,
-      provider: 'slack',
-      status: 'connected',
-      access_token: tokens.access_token,
-      settings: {
-        team_id: tokens.team.id,
-        team_name: tokens.team.name,
-        webhook_url: tokens.incoming_webhook?.url,
-        channel_id: tokens.incoming_webhook?.channel,
-        notify_overdue: true,
-        notify_upcoming: true,
-        notify_days_before: [1, 3, 7],
-      },
-      updated_at: new Date().toISOString(),
-    }, {
-      onConflict: 'firm_id,provider',
-    })
+    // TODO: Store integration in database
+    // Table 'integrations' needs to be created first
+    // await supabase.from('integrations').upsert({
+    //   firm_id,
+    //   provider: 'slack',
+    //   status: 'connected',
+    //   access_token: tokens.access_token,
+    //   settings: {
+    //     team_id: tokens.team.id,
+    //     team_name: tokens.team.name,
+    //     webhook_url: tokens.incoming_webhook?.url,
+    //     channel_id: tokens.incoming_webhook?.channel,
+    //     notify_overdue: true,
+    //     notify_upcoming: true,
+    //     notify_days_before: [1, 3, 7],
+    //   },
+    //   updated_at: new Date().toISOString(),
+    // }, {
+    //   onConflict: 'firm_id,provider',
+    // })
 
     return NextResponse.redirect(
       new URL('/integrations?success=slack', request.url)

@@ -4,7 +4,7 @@ import { Client, ClientDeadline } from '@/types/database'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     
     // Get user session to verify access
     const { data: { user } } = await supabase.auth.getUser()
@@ -223,7 +223,7 @@ function generateSmartRecommendations(
   
   // Return recommendations sorted by priority
   return recommendations.sort((a, b) => {
-    const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 }
+    const priorityOrder: { [key: string]: number } = { critical: 4, high: 3, medium: 2, low: 1 }
     return priorityOrder[b.priority] - priorityOrder[a.priority]
   })
 }

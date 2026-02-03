@@ -67,6 +67,17 @@ export default function ClientsPage() {
               <Link href="/compliance-intelligence" className="text-slate-600 hover:text-slate-900">Compliance Intelligence</Link>
               <Link href="/ai-insights" className="text-blue-600 font-medium">AI Insights</Link>
               <Link href="/settings" className="text-slate-600 hover:text-slate-900">Settings</Link>
+              <button 
+                onClick={async () => {
+                  const { error } = await supabase.auth.signOut();
+                  if (!error) {
+                    window.location.href = '/login';
+                  }
+                }}
+                className="text-slate-600 hover:text-red-600 font-medium"
+              >
+                Logout
+              </button>
               <div className="w-8 h-8 bg-slate-200 rounded-full"></div>
             </nav>
           </div>

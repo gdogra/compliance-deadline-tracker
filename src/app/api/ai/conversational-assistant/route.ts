@@ -4,7 +4,7 @@ import { Client, ClientDeadline } from '@/types/database'
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     
     // Get user session to verify access
     const { data: { user } } = await supabase.auth.getUser()
@@ -124,8 +124,8 @@ async function handleDeadlineInquiry(intent: any, client: Client | null, deadlin
   const response = {
     type: 'deadline_inquiry_response',
     title: 'Deadline Information',
-    content: [],
-    recommendations: []
+    content: [] as string[],
+    recommendations: [] as string[]
   }
   
   if (deadline) {
@@ -161,9 +161,9 @@ async function handlePenaltyCalculation(intent: any, client: Client | null, dead
   const response = {
     type: 'penalty_calculation_response',
     title: 'Penalty Information',
-    content: [],
-    calculations: [],
-    recommendations: []
+    content: [] as string[],
+    calculations: [] as any[],
+    recommendations: [] as string[]
   }
   
   if (deadline) {
@@ -230,9 +230,9 @@ async function handleExtensionRequest(intent: any, client: Client | null, deadli
   const response = {
     type: 'extension_request_response',
     title: 'Extension Information',
-    content: [],
-    forms: [],
-    recommendations: []
+    content: [] as string[],
+    forms: [] as any[],
+    recommendations: [] as string[]
   }
   
   if (deadline) {
@@ -290,9 +290,9 @@ async function handleComplianceGuidance(intent: any, client: Client | null, dead
   const response = {
     type: 'compliance_guidance_response',
     title: 'Compliance Guidance',
-    content: [],
-    requirements: [],
-    recommendations: []
+    content: [] as string[],
+    requirements: [] as string[],
+    recommendations: [] as string[]
   }
   
   if (client && deadline) {
@@ -355,10 +355,10 @@ async function handleFilingRequirement(intent: any, client: Client | null, deadl
   const response = {
     type: 'filing_requirement_response',
     title: 'Filing Requirements',
-    content: [],
-    required_forms: [],
-    supporting_documents: [],
-    recommendations: []
+    content: [] as string[],
+    required_forms: [] as string[],
+    supporting_documents: [] as string[],
+    recommendations: [] as string[]
   }
   
   if (client && deadline) {
@@ -389,8 +389,8 @@ async function handleGeneralInquiry(message: string, client: Client | null, dead
   const response = {
     type: 'general_response',
     title: 'Compliance Assistant Response',
-    content: [],
-    recommendations: []
+    content: [] as string[],
+    recommendations: [] as string[]
   }
   
   // Handle common general questions
@@ -425,7 +425,7 @@ function estimateTaxLiability(client: Client | null, deadline: ClientDeadline | 
 }
 
 function determineRequiredForms(entityType: string, taxType: string, jurisdiction: string): string[] {
-  const forms = []
+  const forms: string[] = []
   
   // Base forms by entity type
   switch (entityType) {
