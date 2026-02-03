@@ -364,7 +364,7 @@ export default function ComplianceIntelligencePage() {
                     
                     <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                       <p className="text-sm text-green-800">
-                        <span className="font-medium">Savings Opportunity:</span> ${costData.savingsOpportunities.toLocaleString()} annually
+                        <span className="font-medium">Savings Opportunity:</span> ${(costData?.savingsOpportunities || 0).toLocaleString()} annually
                       </p>
                       <p className="text-xs text-green-700 mt-1">
                         Through automation and process improvements
