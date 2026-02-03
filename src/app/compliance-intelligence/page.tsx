@@ -44,11 +44,45 @@ export default function ComplianceIntelligencePage() {
       return
     }
 
+    // First get the user's profile to get firm_id
+    const { data: userProfile, error } = await supabase
+      .from('users')
+      .select('firm_id')
+      .eq('id', userData.user.id)
+      .single()
+
+    if (error || !userProfile) {
+      console.error('No user profile found', error)
+      setLoading(false)
+      return
+    }
+
+    const firmId = (userProfile as { firm_id: string }).firm_id
+    if (!firmId) {
+      console.error('No firm ID found for user')
+      setLoading(false)
+      return
+    }
+
+    // Get all clients for the user's firm first
+    const { data: clientsData } = await supabase
+      .from('clients')
+      .select('id')
+      .eq('firm_id', firmId)
+
+    if (!clientsData || clientsData.length === 0) {
+      setDeadlines([])
+      setLoading(false)
+      return
+    }
+
+    const clientIds = (clientsData as { id: string }[]).map(client => client.id)
+
     // Fetch client deadlines
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: deadlinesData } = await (supabase.from('client_deadlines') as any)
+    const { data: deadlinesData } = await supabase
+      .from('client_deadlines')
       .select('*')
-      .eq('firm_id', userData.user.firm_id)
+      .in('client_id', clientIds)
       .order('due_date', { ascending: true })
 
     setDeadlines(deadlinesData || [])
