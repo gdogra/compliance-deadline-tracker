@@ -150,11 +150,12 @@ export default function ComplianceIntelligencePage() {
     setLoading(false)
   }
 
-  // Calculate basic stats
-  const totalDeadlines = deadlines.length
-  const completedDeadlines = deadlines.filter(d => d.status === 'completed').length
-  const missedDeadlines = deadlines.filter(d => d.status === 'missed').length
-  const pendingDeadlines = deadlines.filter(d => d.status === 'pending' || d.status === 'in_progress').length
+  // Calculate basic stats with null safety
+  const safeDeadlines = deadlines || []
+  const totalDeadlines = safeDeadlines.length
+  const completedDeadlines = safeDeadlines.filter(d => d?.status === 'completed').length
+  const missedDeadlines = safeDeadlines.filter(d => d?.status === 'missed').length
+  const pendingDeadlines = safeDeadlines.filter(d => d?.status === 'pending' || d?.status === 'in_progress').length
 
   const completionRate = totalDeadlines > 0 ? Math.round((completedDeadlines / totalDeadlines) * 100) : 0
 
@@ -316,7 +317,7 @@ export default function ComplianceIntelligencePage() {
                 </div>
                 
                 <div className="space-y-3">
-                  {Object.entries(benchmarkData.categories).map(([category, data]: [any, any]) => (
+                  {Object.entries(benchmarkData?.categories || {}).map(([category, data]: [any, any]) => (
                     <div key={category} className="flex items-center justify-between">
                       <span className="text-sm text-slate-700">{category}</span>
                       <div className="flex items-center gap-3">
@@ -345,7 +346,7 @@ export default function ComplianceIntelligencePage() {
                   <div>
                     <h4 className="font-medium text-slate-900 mb-3">Compliance Cost Breakdown</h4>
                     <div className="space-y-3">
-                      {Object.entries(costData.breakdown).map(([category, amount]: [any, any]) => (
+                      {Object.entries(costData?.breakdown || {}).map(([category, amount]: [any, any]) => (
                         <div key={category} className="flex items-center justify-between">
                           <span className="text-sm text-slate-700">{category}</span>
                           <div className="flex items-center gap-3">

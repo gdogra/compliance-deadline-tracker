@@ -73,24 +73,29 @@ export default function AnalyticsPage() {
     setLoading(false)
   }
 
-  // Calculate stats
-  const totalDeadlines = deadlines.length
-  const completedDeadlines = deadlines.filter(d => d.status === 'completed').length
-  const missedDeadlines = deadlines.filter(d => d.status === 'missed').length
-  const extendedDeadlines = deadlines.filter(d => d.status === 'extended').length
-  const pendingDeadlines = deadlines.filter(d => d.status === 'pending' || d.status === 'in_progress').length
+  // Calculate stats with null safety
+  const safeDeadlines = deadlines || []
+  const totalDeadlines = safeDeadlines.length
+  const completedDeadlines = safeDeadlines.filter(d => d?.status === 'completed').length
+  const missedDeadlines = safeDeadlines.filter(d => d?.status === 'missed').length
+  const extendedDeadlines = safeDeadlines.filter(d => d?.status === 'extended').length
+  const pendingDeadlines = safeDeadlines.filter(d => d?.status === 'pending' || d?.status === 'in_progress').length
 
   const completionRate = totalDeadlines > 0 ? Math.round((completedDeadlines / totalDeadlines) * 100) : 0
 
-  // Group by jurisdiction
-  const byJurisdiction = deadlines.reduce((acc, d) => {
-    acc[d.jurisdiction] = (acc[d.jurisdiction] || 0) + 1
+  // Group by jurisdiction with null safety
+  const byJurisdiction = safeDeadlines.reduce((acc, d) => {
+    if (d?.jurisdiction) {
+      acc[d.jurisdiction] = (acc[d.jurisdiction] || 0) + 1
+    }
     return acc
   }, {} as Record<string, number>)
 
-  // Group by tax type
-  const byTaxType = deadlines.reduce((acc, d) => {
-    acc[d.tax_type] = (acc[d.tax_type] || 0) + 1
+  // Group by tax type with null safety
+  const byTaxType = safeDeadlines.reduce((acc, d) => {
+    if (d?.tax_type) {
+      acc[d.tax_type] = (acc[d.tax_type] || 0) + 1
+    }
     return acc
   }, {} as Record<string, number>)
 
@@ -102,15 +107,16 @@ export default function AnalyticsPage() {
     const monthStart = startOfMonth(month)
     const monthEnd = endOfMonth(month)
     
-    const monthDeadlines = deadlines.filter(d => {
+    const monthDeadlines = safeDeadlines.filter(d => {
+      if (!d?.due_date) return false
       const dueDate = new Date(d.due_date)
       return dueDate >= monthStart && dueDate <= monthEnd
     })
     
-    const completed = monthDeadlines.filter(d => d.status === 'completed').length
-    const missed = monthDeadlines.filter(d => d.status === 'missed').length
-    const pending = monthDeadlines.filter(d => d.status === 'pending' || d.status === 'in_progress').length
-    const extended = monthDeadlines.filter(d => d.status === 'extended').length
+    const completed = monthDeadlines.filter(d => d?.status === 'completed').length
+    const missed = monthDeadlines.filter(d => d?.status === 'missed').length
+    const pending = monthDeadlines.filter(d => d?.status === 'pending' || d?.status === 'in_progress').length
+    const extended = monthDeadlines.filter(d => d?.status === 'extended').length
     const total = monthDeadlines.length
     
     return {
