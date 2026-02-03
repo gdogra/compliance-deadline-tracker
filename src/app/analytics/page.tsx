@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { ClientDeadline, User } from '@/types/database'
-import { format, subMonths, startOfMonth, endOfMonth, eachMonthOfInterval } from 'date-fns'
+import { format, subMonths, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths as subMonthsFn } from 'date-fns'
 import { Calendar, TrendingUp, PieChart, BarChart3, CheckCircle, AlertTriangle, Clock, Activity, Brain } from 'lucide-react'
 import Link from 'next/link'
 
@@ -29,15 +29,45 @@ export default function AnalyticsPage() {
       return
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data } = await (supabase.from('client_deadlines') as any)
-      .select('*')
-      .eq('firm_id', userData.user.firm_id)
-      .order('due_date', { ascending: true })
+    // First get the user's profile to get firm_id
+    const { data: userProfile, error } = await supabase
+      .from('users')
+      .select('firm_id')
+      .eq('id', userData.user.id)
+      .single()
 
-    setDeadlines(data || [])
-    setLoading(false)
-  }
+    if (error || !userProfile) {
+      console.error('No user profile found', error)
+      setLoading(false)
+      return
+    }
+
+    const firmId = (userProfile as { firm_id: string }).firm_id
+    if (!firmId) {
+      console.error('No firm ID found for user')
+      setLoading(false)
+      return
+    }
+
+    // Get all client deadlines for the user's firm
+    const { data: clientsData } = await supabase
+      .from('clients')
+      .select('id')
+      .eq('firm_id', firmId)
+
+    if (!clientsData || clientsData.length === 0) {
+      setDeadlines([])
+      setLoading(false)
+      return
+    }
+
+    const clientIds = (clientsData as { id: string }[]).map(client => client.id)
+
+    const { data } = await supabase
+      .from('client_deadlines')
+      .select('*')
+      .in('client_id', clientIds)
+      .order('due_date', { ascending: true })
 
     setDeadlines(data || [])
     setLoading(false)
@@ -63,38 +93,6 @@ export default function AnalyticsPage() {
     acc[d.tax_type] = (acc[d.tax_type] || 0) + 1
     return acc
   }, {} as Record<string, number>)
-
-  // Monthly completion trend (last 6 months)
-  const sixMonthsAgo = subMonths(new Date(), 6)
-  const months = eachMonthOfInterval({ start: sixMonthsAgo, end: new Date() })
-
-  const monthlyTrend = months.map(month => {
-    const monthStart = startOfMonth(month)
-    const monthEnd = endOfMonth(month)
-
-    const monthDeadlines = deadlines.filter(d => {
-      const dueDate = new Date(d.due_date)
-      return dueDate >= monthStart && dueDate <= monthEnd
-    })
-
-    const completed = monthDeadlines.filter(d => d.status === 'completed').length
-    const missed = monthDeadlines.filter(d => d.status === 'missed').length
-    const pending = monthDeadlines.filter(d => d.status === 'pending' || d.status === 'in_progress').length
-    const extended = monthDeadlines.filter(d => d.status === 'extended').length
-    const total = monthDeadlines.length
-
-    return {
-      month: format(month, 'MMM'),
-      completed,
-      missed,
-      pending,
-      extended,
-      total
-    }
-  })
-
-  const maxTotal = Math.max(...monthlyTrend.map(m => m.total), 1)
-  const completionRate = totalDeadlines > 0 ? Math.round((completedDeadlines / totalDeadlines) * 100) : 0
 
   // Monthly completion trend (last 6 months)
   const sixMonthsAgo = subMonths(new Date(), 6)
